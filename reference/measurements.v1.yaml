@@ -1,0 +1,295 @@
+openapi: 3.0.0
+info:
+  title: measurements
+  version: '1.0'
+  description: Statistics API
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/api/insight/v1/measurements/{name}':
+    parameters:
+      - type: string
+        name: name
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  measureId:
+                    type: integer
+                    description: The id of the measurement
+                    format: int64
+                    example: '1'
+                  measureType:
+                    type: string
+                    description: The measurement type
+                    enum:
+                      - matrix
+                      - counter
+                      - fraction
+                      - histogram
+                    example: matrix
+                  data:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: object
+                      properties:
+                        operator:
+                          type: string
+                          description: The identifcation of an operator or null if not aggregated
+                          default: null
+                        tollSystem:
+                          type: string
+                          default: null
+                          description: The identifcation of a toll system or null if not aggregated
+                        roadway:
+                          type: string
+                          default: null
+                          description: The identifcation of a road way or null if not aggregated
+                        plaza:
+                          type: string
+                          default: null
+                          description: The identifcation of a plaza or null if not aggregated
+                        lane:
+                          type: string
+                          default: null
+                          description: The identifcation of a lane or null if not aggregated
+                        camera:
+                          type: string
+                          default: null
+                          description: The identifcation of a camera or null if not aggregated
+                        data:
+                          type: array
+                          items:
+                            oneOf:
+                              - description: 'In case measureType is equal to "matrix" or "histogram"'
+                                properties:
+                                  start:
+                                    type: string
+                                    description: The start date time (ISO 8601) of this data object
+                                    format: date-time
+                                    example: '2019-11-19T14:00:00.0000000Z'
+                                  end:
+                                    type: string
+                                    description: The end date time (ISO 8601) of this data object
+                                    format: date-time
+                                    example: '2019-11-19T15:00:00.0000000Z'
+                                  values:
+                                    type: array
+                                    description: The values of this data object
+                                    items:
+                                      oneOf:
+                                        - description: 'In case measureType is equal to "matrix"'
+                                          properties:
+                                            column:
+                                              type: string
+                                              description: The matrix column
+                                            row:
+                                              type: string
+                                              description: The matrix row
+                                            value:
+                                              type: integer
+                                              format: int64
+                                              description: The value
+                                          required:
+                                            - column
+                                            - row
+                                            - value
+                                        - description: 'In case measureType is equal to "histogram"'
+                                          properties:
+                                            category:
+                                              type: string
+                                              description: The histogram category of the value
+                                            value:
+                                              type: integer
+                                              format: int64
+                                              description: The value
+                                          required:
+                                            - category
+                                            - value
+                                      type: object
+                                required:
+                                  - start
+                                  - end
+                                  - values
+                              - description: 'In case measureType is equal to "counter"'
+                                properties:
+                                  start:
+                                    type: string
+                                    description: The start date time (ISO 8601) of this data object
+                                    format: date-time
+                                    example: '2019-11-19T14:00:00.0000000Z'
+                                  end:
+                                    type: string
+                                    description: The end date time (ISO 8601) of this data object
+                                    format: date-time
+                                    example: '2019-11-19T15:00:00.0000000Z'
+                                  value:
+                                    type: integer
+                                    description: The value of this data object
+                                    format: int64
+                                    example: '1'
+                                required:
+                                  - start
+                                  - end
+                                  - value
+                              - description: 'In case measureType is equal to "fraction"'
+                                properties:
+                                  start:
+                                    type: string
+                                    format: date-time
+                                    example: '2019-11-19T14:00:00.0000000Z'
+                                    description: The start date time (ISO 8601) of this data object
+                                  end:
+                                    type: string
+                                    description: The end date time (ISO 8601) of this data object
+                                    format: date-time
+                                    example: '2019-11-19T15:00:00.0000000Z'
+                                  baseValue:
+                                    type: integer
+                                    format: int64
+                                    description: The base value (denominator)
+                                  value:
+                                    type: integer
+                                    format: int64
+                                    description: The value (numerator)
+                                required:
+                                  - start
+                                  - end
+                                  - baseValue
+                                  - value
+                            type: object
+                        
+                      required:
+                        - operator
+                        - tollSystem
+                        - roadway
+                        - plaza
+                        - lane
+                        - camera
+                        - data
+                required:
+                  - measureId
+                  - measureType
+                  - data
+              examples:
+                matrix measurement:
+                  value:
+                    measureId: 1
+                    measureType: matrix
+                    data:
+                      - operator: exampleOperator
+                        tollSystem: exampleTollSystem
+                        roadWay: exampleRoadWay
+                        plaza: examplePlaza
+                        lane: exampleLane
+                        camera: exampleCamera
+                        data:
+                          - start: '2019-11-19T14:00:00.0000000Z'
+                            end: '2019-11-19T15:00:00.0000000Z'
+                            values:
+                              - column: USA_NY
+                                row: LLLDDDD
+                                value: 5
+                histogram:
+                  value:
+                    measureId: 1
+                    measureType: histogram
+                    data:
+                      - operator: exampleOperator
+                        tollSystem: exampleTollSystem
+                        roadWay: exampleRoadWay
+                        plaza: examplePlaza
+                        lane: exampleLane
+                        camera: exampleCamera
+                        data:
+                          - start: '2019-11-19T14:00:00.0000000Z'
+                            end: '2019-11-19T15:00:00.0000000Z'
+                            values:
+                              - category: AutomatedGeneric
+                                value: 1
+                counter:
+                  value:
+                    measureId: 1
+                    measureType: counter
+                    data:
+                      - operator: exampleOperator
+                        tollSystem: exampleTollSystem
+                        roadWay: exampleRoadWay
+                        plaza: examplePlaza
+                        lane: exampleLane
+                        camera: exampleCamera
+                        data:
+                          - start: '2019-11-19T14:00:00.0000000Z'
+                            end: '2019-11-19T15:00:00.0000000Z'
+                            value: 1
+                fraction:
+                  value:
+                    measureId: 1
+                    measureType: histogram
+                    data:
+                      - operator: exampleOperator
+                        tollSystem: exampleTollSystem
+                        roadWay: exampleRoadWay
+                        plaza: examplePlaza
+                        lane: exampleLane
+                        camera: exampleCamera
+                        data:
+                          - start: '2019-11-19T14:00:00.0000000Z'
+                            end: '2019-11-19T15:00:00.0000000Z'
+                            baseValue: 10
+                            value: 5
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      parameters:
+        - schema:
+            type: string
+            default: tollSystem.roadWay.plaza.lane.camera
+            enum:
+              - operator
+              - operator.tollSystem
+              - operator.tollSystem.roadway
+              - operator.tollSystem.roadway.plaza
+              - operator.tollSystem.roadway.plaza.lane
+              - operator.tollSystem.roadway.plaza.lane.camera
+          in: query
+          name: divisionAggregation
+          description: Level of divistion aggregation
+        - schema:
+            type: number
+            enum:
+              - '600'
+              - '3600'
+              - '86400'
+          in: query
+          name: timeWindowAggregation
+          description: Time window aggregation in seconds
+        - schema:
+            type: boolean
+            enum:
+              - '0'
+              - '1'
+            default: '1'
+          in: query
+          name: fill
+          description: Whether the response body should be filled with zeros on places where values have not been measured.
+      description: ''
+      operationId: ''
+components:
+  schemas: {}
+  securitySchemes:
+    Basic auth:
+      type: http
+      scheme: Basic
+      description: Basic authentication
